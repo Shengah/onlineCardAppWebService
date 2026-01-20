@@ -2,7 +2,7 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
 require('dotenv').config();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 //database config info
 const dbConfig = {
@@ -26,50 +26,50 @@ app.listen(port, () => {
     console.log(`Server running on port ${port}`)
 });
 
-// const cors = require("cors");
-// const allowedOrigins = [
-// "http://localhost:3000",
-// // "https://YOUR-frontend.vercel.app", // add later
-// // "https://onlinecardappwebservice-h98k.onrender.com" 
-// ];
-// app.use(
-// cors({
-// origin: function (origin, callback) {
-// // allow requests with no origin (Postman/server-to-server)
-// if (!origin) return callback(null, true);
-// if (allowedOrigins.includes(origin)) {
-// return callback(null, true);
-// }
-// return callback(new Error("Not allowed by CORS"));
-// },
-// methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-// allowedHeaders: ["Content-Type", "Authorization"],
-// credentials: false,
-// })
-// );
+const cors = require("cors");
+const allowedOrigins = [
+    "http://localhost:3000",
+    // "https://YOUR-frontend.vercel.app", // add later
+    // "https://onlinecardappwebservice-h98k.onrender.com" 
+];
+app.use(
+    cors({
+        origin: function (origin, callback) {
+            // allow requests with no origin (Postman/server-to-server)
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+            return callback(new Error("Not allowed by CORS"));
+        },
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: false,
+    })
+);
 
 
 //Example Route: Get all cards
 app.get('/allcards', async (req, res) => {
-    try{
+    try {
         let connection = await mysql.createConnection(dbConfig);
         const [rows] = await connection.execute('SELECT * FROM defaultdb.cards');
         res.json(rows);
-    } catch(err) {
+    } catch (err) {
         console.error(err);
-        res.status(500).json({message: 'Server error for allcards'});
+        res.status(500).json({ message: 'Server error for allcards' });
     }
 });
 
 //Example Route: Create a new card
 app.post('/addcard', async (req, res) => {
-    const {card_name, card_pic} = req.body;
+    const { card_name, card_pic } = req.body;
     try {
         let connection = await mysql.createConnection(dbConfig);
         await connection.execute('INSERT INTO cards(card_name, card_pic) VALUES(?, ?)', [card_name, card_pic]);
-        res.status(201).json({message: 'Card' +card_name+' has been added!'});
-    } catch(err) {
+        res.status(201).json({ message: 'Card' + card_name + ' has been added!' });
+    } catch (err) {
         console.error(err);
-        res.status(500).json({message: 'Server error - could not add card'+card_name});
+        res.status(500).json({ message: 'Server error - could not add card' + card_name });
     }
 });
