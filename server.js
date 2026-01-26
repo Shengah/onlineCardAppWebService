@@ -136,7 +136,7 @@ app.post("/addcard", requireAuth, async (req, res) => {
 });
 
 // update a card, week 10
-app.put("/updatecard/:id", async (req, res) => {
+app.put("/updatecard/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
   const { card_name, card_pic } = req.body;
 
@@ -168,7 +168,7 @@ app.put("/updatecard/:id", async (req, res) => {
 });
 
 // delete a card, week 10
-app.delete("/deletecard/:id", async (req, res) => {
+app.delete("/deletecard/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
 
   try {
